@@ -51,42 +51,129 @@ window.onload = function () {
     }
   }
 }
-//-----------------------------------------------------------------
-//onfocus function
-function myFocus(field) {
-  let err = field.name + 'error'
-  if (field.value.length == 0 && !document.getElementById(err)) {
-    let errorMsg = document.createElement('span')
-    errorMsg.id = err
-    errorMsg.textContent = ''
-    errorMsg.style.color = ''
-    field.parentNode.appendChild(errorMsg)
-  }
-}
-//-------------------------validations--------------------------------------------------------
-//text boxes validation
-function text(textValid) {
-  let type = textValid.getAttribute('type')
-  let show = textValid.name + 'error'
-  let minLength = textValid.getAttribute('min')
-  let maxLength = textValid.getAttribute('max')
-  if (minLength == null) minLength = 2
-  if (maxLength == null) maxLength = 50
-  if (type == 'text') {
-    let textValue = textValid.value.length
-    if (textValue == 1) {
-      document.getElementById(show).innerHTML = '&#10008; minimum 2 chars'
-      document.getElementById(show).style.color = 'red'
-      return false
-    } else if (textValue >= minLength && textValue <= maxLength) {
-      document.getElementById(show).innerHTML = '&#10004; ok'
-      document.getElementById(show).style.color = '#1758c1'
-      document.getElementById('firstname').style.border = '1px solid #1758c1'
-      document.getElementById('lastname').style.border = '1px solid #1758c1'
-      return true
+// List of Indian States with their respective zip codes
+console.log("Script loaded");
+const indianStates = [
+  { state: "Andhra Pradesh", zipcodes: ["50", "51", "52", "53", "54"] },
+  { state: "Arunachal Pradesh", zipcodes: ["79"] },
+  { state: "Assam", zipcodes: ["78"] },
+  { state: "Bihar", zipcodes: ["80", "81", "82"] },
+  { state: "Chhattisgarh", zipcodes: ["49"] },
+  { state: "Goa", zipcodes: ["40"] },
+  { state: "Gujarat", zipcodes: ["36", "37", "38"] },
+  { state: "Haryana", zipcodes: ["12", "13", "14"] },
+  { state: "Himachal Pradesh", zipcodes: ["17"] },
+  { state: "Jharkhand", zipcodes: ["82", "83"] },
+  { state: "Karnataka", zipcodes: ["56", "57", "58"] },
+  { state: "Kerala", zipcodes: ["67", "68"] },
+  { state: "Madhya Pradesh", zipcodes: ["45", "46", "47", "48"] },
+  { state: "Maharashtra", zipcodes: ["40", "41", "42", "43", "44"] },
+  { state: "Manipur", zipcodes: ["79"] },
+  { state: "Meghalaya", zipcodes: ["79"] },
+  { state: "Mizoram", zipcodes: ["79"] },
+  { state: "Nagaland", zipcodes: ["79"] },
+  { state: "Odisha", zipcodes: ["75", "76", "77"] },
+  { state: "Punjab", zipcodes: ["14", "14"] },
+  { state: "Rajasthan", zipcodes: ["30", "31", "32", "33", "34", "30", "31"] },
+  { state: "Sikkim", zipcodes: ["73"] },
+  { state: "Tamil Nadu", zipcodes: ["60", "60", "62", "63", "64"] },
+  { state: "Telangana", zipcodes: ["50", "50", "51", "50", "51"] },
+  { state: "Tripura", zipcodes: ["79"] },
+  { state: "Uttar Pradesh", zipcodes: ["20", "21", "22", "23", "24"] },
+  { state: "Uttarakhand", zipcodes: ["24"] },
+  { state: "West Bengal", zipcodes: ["70", "71", "72", "73", "74"] },
+  { state: "Andaman and Nicobar Islands", zipcodes: ["74"] },
+  { state: "Chandigarh", zipcodes: ["16"] },
+  { state: "Dadra and Nagar Haveli and Daman and Diu", zipcodes: ["39"] },
+  { state: "Delhi", zipcodes: ["11"] },
+  { state: "Lakshadweep", zipcodes: ["68"] },
+  { state: "Puducherry", zipcodes: ["60"] },
+  { state: "Jammu and Kashmir", zipcodes: ["18", "19"] },
+  { state: "Ladakh", zipcodes: ["19"] },
+];
+
+// Populate States Dropdown
+const stateDropdown = document.getElementById("state");
+indianStates.forEach(stateObj => {
+  let option = document.createElement("option");
+  option.text = stateObj.state;
+  option.value = stateObj.state;
+  stateDropdown.appendChild(option);
+});
+
+// Function to get State by Zipcode
+// Function to get State by Zipcode
+function getStateByZipcode(zipcode) {
+  let trimmedZipcode = zipcode.trim(); // Trim any leading or trailing whitespace
+  for (let i = 0; i < indianStates.length; i++) {
+    if (indianStates[i].zipcodes.includes(trimmedZipcode)) {
+      return indianStates[i].state;
     }
   }
+  return null; // Return null if no matching state found
 }
+
+
+// Function to validate Zipcode and update State dropdown
+// Function to validate Zipcode and update State dropdown
+function validateZipcode() {
+  let zipcodeInput = document.getElementById("zipcode");
+  let zipcodeValue = zipcodeInput.value.trim(); // Trim whitespace
+  let stateValue = getStateByZipcode(zipcodeValue);
+
+  if (stateValue) {
+    let stateDropdown = document.getElementById("state");
+    stateDropdown.value = stateValue;
+  } 
+}
+// Form Element Validation and State Selection
+let form = document.forms[0];
+form.onsubmit = function (event) {
+  event.preventDefault();
+  let isValid = true;
+
+  // Validate Zipcode
+  let zipcodeInput = form.elements["zipcode"];
+  let zipcodeValue = zipcodeInput.value.trim();
+  let zipRegex = /^\d{6}$/;
+  if (!zipRegex.test(zipcodeValue)) {
+    let errorSpan = document.getElementById("zipcodeerror");
+    if (errorSpan) {
+      errorSpan.textContent = "Please enter a valid 6-digit Indian zipcode";
+      errorSpan.style.color = "red";
+    }
+    isValid = false;
+  } else {
+    let stateValue = getStateByZipcode(zipcodeValue);
+    if (stateValue) {
+      stateDropdown.value = stateValue;
+    } else {
+      isValid = false;
+      let errorSpan = document.getElementById("zipcodeerror");
+      if (errorSpan) {
+        errorSpan.textContent = "Invalid Indian zipcode entered";
+        errorSpan.style.color = "red";
+      }
+    }
+  }
+
+  // Validate State
+  let stateInput = form.elements["state"];
+  let stateValue = stateInput.value.trim();
+  if (stateValue === "") {
+    let errorSpan = document.getElementById("stateerror");
+    if (errorSpan) {
+      errorSpan.textContent = "Please select a state";
+      errorSpan.style.color = "red";
+    }
+    isValid = false;
+  }
+
+  // If all validations pass, submit the form
+  if (isValid) {
+    form.submit();
+  }
+};
 //---------------------------------------------------------------------
 // Email validation function
 function email(emailValid) {
